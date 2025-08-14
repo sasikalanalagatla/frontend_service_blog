@@ -1,0 +1,167 @@
+:root {
+    --brand: #0f766e; 
+}
+
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    margin: 0; 
+    color: #111827; 
+}
+
+.container { 
+    max-width: 960px; 
+    margin: 0 auto; 
+    padding: 24px 16px; 
+}
+
+header { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 16px; 
+    padding-bottom: 12px; 
+    border-bottom: 1px solid #e5e7eb; 
+}
+
+header h1 { 
+    margin: 0; 
+    font-size: 24px; 
+}
+
+header a { 
+    color: inherit; 
+    text-decoration: none; 
+}
+
+nav ul { 
+    list-style: none; 
+    display: flex; 
+    gap: 12px; 
+    margin: 0; 
+    padding: 0; 
+}
+
+nav a { 
+    color: var(--brand); 
+    text-decoration: none; 
+}
+
+nav a:hover { 
+    text-decoration: underline; 
+}
+
+.actions { 
+    display: flex; 
+    gap: 12px; 
+    align-items: center; 
+}
+
+.btn { 
+    background: var(--brand); 
+    color: #fff; 
+    border: none; 
+    border-radius: 6px; 
+    padding: 8px 12px; 
+    text-decoration: none; 
+    cursor: pointer;
+}
+
+.btn:hover { 
+    filter: brightness(1.05); 
+}
+
+.btn-secondary { 
+    background: #6b7280; 
+}
+
+.btn-outline { 
+    background: transparent; 
+    color: var(--brand); 
+    border: 2px solid var(--brand); 
+}
+
+.user-menu { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+
+.user-info { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.user-role { 
+    background: var(--brand); 
+    color: white; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    font-weight: 500; 
+}
+
+.admin-role { 
+    background: #dc2626; 
+}
+
+section { 
+    margin-top: 20px; 
+}
+
+footer { 
+    margin-top: 32px; 
+    padding-top: 12px; 
+    border-top: 1px solid #e5e7eb; 
+    color: #6b7280; 
+    font-size: 14px; 
+}
+
+.form-group {
+    margin-bottom: 20px; 
+}
+
+.form-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-weight: 500; 
+}
+
+.form-group input, 
+.form-group textarea { 
+    width: 100%; 
+    padding: 12px; 
+    border: 2px solid #e5e7eb; 
+    border-radius: 8px; 
+    font-size: 16px; 
+    box-sizing: border-box; 
+}
+
+.form-group input:focus, 
+.form-group textarea:focus { 
+    outline: none; 
+    border-color: var(--brand); 
+}
+
+.form-group textarea { 
+    min-height: 200px; 
+    resize: vertical; 
+}
+
+.flash-message {
+    padding: 12px; 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+}
+
+.flash-success { 
+    background: #f0fdf4; 
+    border: 1px solid #bbf7d0; 
+    color: #059669; 
+}
+
+.flash-error { 
+    background: #fef2f2; 
+    border: 1px solid #fecaca; 
+    color: #dc2626; 
+}

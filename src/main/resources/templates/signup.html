@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Blog - Sign Up</title>
+    <style>
+        :root { --brand: #0f766e; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin:0; color:#111827; background-color: #f9fafb; }
+        .container { max-width: 500px; margin: 0 auto; padding: 24px 16px; }
+        header { text-align: center; margin-bottom: 32px; }
+        header h1 { margin:0; font-size:28px; color: var(--brand); }
+        header p { margin:8px 0 0 0; color:#6b7280; }
+        .form-container { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #374151; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .form-group input:focus { outline: none; border-color: var(--brand); }
+        .form-row { display: flex; gap: 16px; }
+        .form-row .form-group { flex: 1; }
+        .btn { width: 100%; background: var(--brand); color: white; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 500; cursor: pointer; margin-bottom: 16px; }
+        .btn:hover { filter: brightness(1.05); }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { filter: brightness(1.05); }
+        .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; }
+        .success { color: #059669; background: #f0fdf4; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bbf7d0; }
+        .links { text-align: center; margin-top: 24px; }
+        .links a { color: var(--brand); text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+        .divider { text-align: center; margin: 24px 0; color: #6b7280; position: relative; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e5e7eb; }
+        .divider span { background: white; padding: 0 16px; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <header>
+        <h1><a href="/" style="text-decoration:none;color:inherit;">Blog</a></h1>
+        <p>Create your account to start blogging</p>
+    </header>
+
+    <div class="form-container">
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        <div th:if="${success}" class="success" th:text="${success}"></div>
+
+        <form method="post" action="/auth/signup" th:object="${registerRequest}">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" th:field="*{name}" required th:value="${name}"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" th:field="*{email}" required th:value="${email}"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" th:field="*{password}" required minlength="6"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6"/>
+            </div>
+            
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <a href="/auth/signin" class="btn btn-secondary" style="display: block; text-align: center; text-decoration: none;">Sign In to Existing Account</a>
+
+        <div class="links">
+            <a href="/">Back to Home</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+
+
+

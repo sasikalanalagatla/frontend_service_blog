@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Blog - Home</title>
+    <style>
+      :root { --brand: #0f766e; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin:0; color:#111827; }
+      .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+      header { display:flex; align-items:center; justify-content: space-between; gap:16px; padding-bottom:12px; border-bottom:1px solid #e5e7eb; }
+      header h1 { margin:0; font-size:24px; }
+      header a { color: inherit; text-decoration:none; }
+      .actions { display:flex; gap:12px; align-items:center; }
+      .btn { background: var(--brand); color:#fff; border:none; border-radius:6px; padding:8px 12px; text-decoration:none; }
+      .btn:hover { filter: brightness(1.05); }
+      .btn-secondary { background: #6b7280; }
+      .btn-outline { background: transparent; color: var(--brand); border: 2px solid var(--brand); }
+      .user-menu { display: flex; align-items: center; gap: 12px; }
+      .user-info { display: flex; align-items: center; gap: 8px; }
+      .user-role { background: var(--brand); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+      .admin-role { background: #dc2626; }
+      section { margin-top:20px; }
+      ul.posts { padding-left: 18px; }
+      .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+      .sort-controls { display: flex; gap: 12px; align-items: center; }
+      .sort-controls select { padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; }
+      .filter-controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+      .filter-controls select { padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; }
+      .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+      .pagination a, .pagination span { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; text-decoration: none; color: var(--brand); }
+      .pagination .current { background: var(--brand); color: white; border-color: var(--brand); }
+      .pagination a:hover { background: #f9fafb; }
+      .tag-filter { background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+      .tag-filter h3 { margin: 0 0 8px 0; font-size: 14px; color: #6b7280; }
+      .tag-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+      .tag-btn { background: white; border: 1px solid #d1d5db; border-radius: 16px; padding: 4px 12px; font-size: 12px; color: #374151; text-decoration: none; }
+      .tag-btn:hover { background: #f9fafb; }
+      .tag-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
+      .post-tags { margin-top: 4px; }
+      .post-tags span { background: #f3f4f6; border-radius: 12px; padding: 2px 8px; font-size: 11px; color: #6b7280; margin-right: 4px; }
+    </style>
+</head>
+<body>
+<main class="container">
+    <header>
+        <h1><a href="/" style="text-decoration:none;color:inherit;">Blog</a></h1>
+        <div class="actions">
+          <form method="get" action="/">
+              <input type="text" name="keyword" placeholder="Search posts..." th:value="${keyword}"/>
+          </form>
+          
+          <div th:if="${currentUser == null}">
+              <a class="btn" href="/auth/signin">Sign In</a>
+              <a class="btn btn-secondary" href="/auth/signup">Sign Up</a>
+          </div>
+          
+          <div th:if="${currentUser != null}" class="user-menu">
+              <div class="user-info">
+                  <span th:text="${currentUser.name}"></span>
+                  <span th:class="${currentUser.role == 'ADMIN' ? 'user-role admin-role' : 'user-role'}" 
+                        th:text="${currentUser.role}"></span>
+              </div>
+              <a class="btn" href="/posts/create">Create Post</a>
+              <a class="btn btn-outline" href="/users/profile">Profile</a>
+              <form method="post" action="/auth/signout" style="display: inline;">
+                  <button type="submit" class="btn btn-secondary">Sign Out</button>
+              </form>
+          </div>
+        </div>
+    </header>
+
+    <section>
+        <h2>Latest Posts</h2>
+        
+        <div th:if="${allTags != null and !#lists.isEmpty(allTags)}" class="tag-filter">
+            <h3>Filter by Tags</h3>
+            <div class="tag-buttons">
+                <a th:href="@{/(keyword=${keyword}, sort=${sort})}" th:class="${selectedTag == null ? 'tag-btn active' : 'tag-btn'}">All Posts</a>
+                <a th:each="tag : ${allTags}" 
+                   th:href="@{/(tag=${tag}, keyword=${keyword}, sort=${sort})}" 
+                   th:class="${selectedTag == tag ? 'tag-btn active' : 'tag-btn'}"
+                   th:text="${tag}"></a>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="sort-controls">
+                <form method="get" action="/" style="display: inline;">
+                    <input type="hidden" name="tag" th:value="${selectedTag}"/>
+                    <input type="hidden" name="keyword" th:value="${keyword}"/>
+                    <label for="sort">Sort by:</label>
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="newest" th:selected="${sort == 'newest'}">Newest First</option>
+                        <option value="oldest" th:selected="${sort == 'oldest'}">Oldest First</option>
+                        <option value="title" th:selected="${sort == 'title'}">Title A-Z</option>
+                        <option value="author" th:selected="${sort == 'author'}">Author A-Z</option>
+                    </select>
+                </form>
+            </div>
+            <div>
+                <span th:text="${'Showing ' + posts.size() + ' of ' + totalPosts + ' posts'}"></span>
+            </div>
+        </div>
+        
+        <div th:if="${posts == null or #lists.isEmpty(posts)}">No posts yet.</div>
+        <ul class="posts" th:if="${posts != null}">
+            <li th:each="post : ${posts}">
+                <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}"></a>
+                <div th:if="${post.excerpt != null and post.excerpt.length() > 0}" 
+                     th:text="${post.excerpt}" style="color: #6b7280; margin: 8px 0;"></div>
+                <small>by <span th:text="${post.author}"></span> ·
+                    <span th:text="${post.isPublished ? #temporals.format(post.publishedAt, 'yyyy-MM-dd HH:mm') : 'Draft'}"></span>
+                    <span th:if="${post.tags != null and !#lists.isEmpty(post.tags)}" class="post-tags">
+                        · Tags: <span th:each="tag, iterStat : ${post.tags}">
+                            <span th:text="${tag}"></span>
+                        </span>
+                    </span>
+                </small>
+            </li>
+        </ul>
+        
+        <div th:if="${totalPages > 1}" class="pagination">
+            <a th:if="${currentPage > 1}" th:href="@{/(page=${currentPage - 1}, sort=${sort}, tag=${selectedTag}, keyword=${keyword})}">&laquo; Previous</a>
+            
+            <span th:each="pageNum : ${#numbers.sequence(1, totalPages)}" 
+                  th:class="${pageNum == currentPage ? 'current' : ''}">
+                <a th:if="${pageNum != currentPage}" th:href="@{/(page=${pageNum}, sort=${sort}, tag=${selectedTag}, keyword=${keyword})}" th:text="${pageNum}"></a>
+                <span th:if="${pageNum == currentPage}" th:text="${pageNum}"></span>
+            </span>
+            
+            <a th:if="${currentPage < totalPages}" th:href="@{/(page=${currentPage + 1}, sort=${sort}, tag=${selectedTag}, keyword=${keyword})}">Next &raquo;</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

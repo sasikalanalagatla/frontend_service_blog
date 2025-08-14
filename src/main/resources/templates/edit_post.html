@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Blog - Edit Post</title>
+  <style>
+    :root { --brand: #0f766e; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin:0; color:#111827; }
+    .container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+    header { display:flex; align-items:center; justify-content: space-between; gap:16px; padding-bottom:12px; border-bottom:1px solid #e5e7eb; }
+    header h1 { margin:0; font-size:24px; }
+    header a { color: inherit; text-decoration:none; }
+    nav ul { list-style:none; display:flex; gap:12px; margin:0; padding:0; }
+    nav a { color: var(--brand); text-decoration:none; }
+    nav a:hover { text-decoration: underline; }
+    .actions { display:flex; gap:12px; align-items:center; }
+    .btn { background: var(--brand); color:#fff; border:none; border-radius:6px; padding:8px 12px; text-decoration:none; }
+    .btn:hover { filter: brightness(1.05); }
+    .btn-secondary { background: #6b7280; }
+    .btn-outline { background: transparent; color: var(--brand); border: 2px solid var(--brand); }
+    .user-menu { display: flex; align-items: center; gap: 12px; }
+    .user-info { display: flex; align-items: center; gap: 8px; }
+    .user-role { background: var(--brand); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .admin-role { background: #dc2626; }
+    section { margin-top:20px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--brand); }
+    .form-group textarea { min-height: 200px; resize: vertical; }
+    .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+    footer { margin-top:32px; padding-top:12px; border-top:1px solid #e5e7eb; color:#6b7280; font-size:14px; }
+  </style>
+</head>
+<body>
+<main class="container">
+  <header>
+    <h1><a href="/" style="text-decoration:none;color:inherit;">Blog</a></h1>
+    <div class="actions">
+      <form method="get" action="/search">
+          <input type="text" name="keyword" placeholder="Search posts..."/>
+      </form>
+      
+      <div th:if="${currentUser != null}" class="user-menu">
+          <div class="user-info">
+              <span th:text="${currentUser.name}"></span>
+              <span th:class="${currentUser.role == 'ADMIN' ? 'user-role admin-role' : 'user-role'}" 
+                    th:text="${currentUser.role}"></span>
+          </div>
+          <a class="btn" href="/posts/create">Create Post</a>
+          <a class="btn btn-outline" href="/users/profile">Profile</a>
+          <form method="post" action="/auth/signout" style="display: inline;">
+              <button type="submit" class="btn btn-secondary">Sign Out</button>
+          </form>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>Edit Post</h2>
+    <form method="post" th:action="@{'/posts/' + ${post.id}}" th:object="${post}">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" th:field="*{title}" required/>
+      </div>
+      
+      <div class="form-group">
+        <label for="excerpt">Excerpt</label>
+        <textarea id="excerpt" name="excerpt" th:field="*{excerpt}" placeholder="Brief summary of the post..." style="min-height: 100px;"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea id="content" name="content" th:field="*{content}" required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="tagsCsv">Tags (comma-separated)</label>
+        <input type="text" id="tagsCsv" name="tagsCsv" th:value="${tagsCsv}" placeholder="e.g., technology, programming, java"/>
+      </div>
+      
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="published" th:field="*{published}"/>
+          Published
+        </label>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn">Update Post</button>
+        <a th:href="@{'/posts/' + ${post.id}}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <small>&copy; <span th:text="${#dates.format(#dates.createNow(),'yyyy')}"></span> Blog</small>
+  </footer>
+</main>
+</body>
+</html>
