@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "comment-service")
+@FeignClient(name = "comment-service", url="${COMMENT_SERVICE_URL}")
 public interface CommentServiceClient {
     
     @GetMapping("/api/comments/{id}")

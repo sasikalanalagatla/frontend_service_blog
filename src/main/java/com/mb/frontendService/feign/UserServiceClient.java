@@ -7,7 +7,7 @@ import com.mb.frontendService.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "user-service")
+@FeignClient(name = "user-service", url="${USER_SERVICE_URL}")
 public interface UserServiceClient {
     
     @GetMapping("/api/users/{id}")

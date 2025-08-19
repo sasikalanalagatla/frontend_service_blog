@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "post-service")
+@FeignClient(name = "post-service", url="${POST_SERVICE_URL}")
 public interface PostServiceClient {
     
     @GetMapping("/api/posts/{id}")
