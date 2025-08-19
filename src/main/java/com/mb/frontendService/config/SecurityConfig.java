@@ -14,20 +14,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/posts/**", "/auth/**", "/css/**", "/js/**", "/users/*/profile").permitAll()
-                .requestMatchers("/posts/create", "/posts/*/edit", "/posts/*/delete").authenticated()
-                .requestMatchers("/posts/*/comment", "/posts/*/comments/**").authenticated()
-                .requestMatchers("/comments/**").authenticated()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .csrf(csrf -> csrf.disable())
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable())
-            .logout(logout -> logout.disable())
-            .addFilterBefore(new SessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(
+                                "/",
+                                "/posts/**",
+                                "/auth/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/favicon.ico",   // ✅ allow favicon
+                                "/error",         // ✅ allow error page
+                                "/users/*/profile"
+                        ).permitAll()
+                        .requestMatchers("/posts/create", "/posts/*/edit", "/posts/*/delete").authenticated()
+                        .requestMatchers("/posts/*/comment", "/posts/*/comments/**").authenticated()
+                        .requestMatchers("/comments/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
+                .logout(logout -> logout.disable())
+                .addFilterBefore(new SessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

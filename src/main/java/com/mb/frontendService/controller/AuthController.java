@@ -5,6 +5,8 @@ import com.mb.frontendService.dto.LoginRequest;
 import com.mb.frontendService.dto.RegisterRequest;
 import com.mb.frontendService.feign.UserServiceClient;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private UserServiceClient userServiceClient;
@@ -26,6 +29,7 @@ public class AuthController {
     @GetMapping("/signin")
     public String signInForm(Model model, HttpSession session) {
         if (session.getAttribute("user") != null) {
+            logger.info("User already signed in, redirecting to home.");
             return "redirect:/";
         }
 
@@ -39,22 +43,25 @@ public class AuthController {
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
         try {
+            logger.info("Attempting login for user: {}", loginRequest.getName());
             AuthResponse authResponse = userServiceClient.login(loginRequest);
 
             if (authResponse.getUser() != null && authResponse.getToken() != null) {
                 session.setAttribute("user", authResponse.getUser());
                 session.setAttribute("token", authResponse.getToken());
 
-                redirectAttributes.addFlashAttribute("successMessage", "Welcome back, " + authResponse.getUser().getName() + "!");  // ✅ Use getName() only
+                logger.info("User {} logged in successfully.", authResponse.getUser().getName());
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Welcome back, " + authResponse.getUser().getName() + "!");
                 return "redirect:/";
             } else {
+                logger.warn("Login failed for user: {}", loginRequest.getName());
                 model.addAttribute("errorMessage", "Login failed. Please check your credentials.");
                 return "signin";
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-
+            logger.error("Error during login for user {}: {}", loginRequest.getName(), e.getMessage(), e);
             model.addAttribute("errorMessage", "Login failed: " + e.getMessage());
             return "signin";
         }
@@ -63,6 +70,7 @@ public class AuthController {
     @GetMapping("/signup")
     public String signUpForm(Model model, HttpSession session) {
         if (session.getAttribute("user") != null) {
+            logger.info("User already signed in, redirecting to home.");
             return "redirect:/";
         }
 
@@ -76,10 +84,13 @@ public class AuthController {
                          HttpSession session,
                          RedirectAttributes redirectAttributes) {
         try {
+            logger.info("Attempting registration for email: {}", registerRequest.getEmail());
+
             if (registerRequest.getPassword() == null || registerRequest.getConfirmPassword() == null ||
-                !registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                    !registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                logger.warn("Password mismatch during registration for email: {}", registerRequest.getEmail());
                 model.addAttribute("error", "Passwords do not match");
-                model.addAttribute("name", registerRequest.getName());  // ✅ Changed from username
+                model.addAttribute("name", registerRequest.getName());
                 model.addAttribute("email", registerRequest.getEmail());
                 return "signup";
             }
@@ -87,20 +98,22 @@ public class AuthController {
             AuthResponse response = userServiceClient.register(registerRequest);
 
             if (response.getUser() != null && response.getToken() != null) {
-                redirectAttributes.addFlashAttribute("success", "🎉 Registration successful! Your account has been created. Please sign in with your credentials.");
+                logger.info("Registration successful for user: {}", response.getUser().getName());
+                redirectAttributes.addFlashAttribute("success",
+                        "🎉 Registration successful! Please sign in with your credentials.");
                 return "redirect:/auth/signin";
             } else {
-                String errorMsg = response.getMessage() != null ? response.getMessage() : "Registration failed. Please try again.";
+                String errorMsg = response.getMessage() != null ? response.getMessage() : "Registration failed.";
+                logger.warn("Registration failed for email {}: {}", registerRequest.getEmail(), errorMsg);
                 model.addAttribute("error", errorMsg);
-                model.addAttribute("name", registerRequest.getName());  // ✅ Changed from username
+                model.addAttribute("name", registerRequest.getName());
                 model.addAttribute("email", registerRequest.getEmail());
                 return "signup";
             }
         } catch (Exception e) {
-            e.printStackTrace();
-
+            logger.error("Error during registration for email {}: {}", registerRequest.getEmail(), e.getMessage(), e);
             model.addAttribute("error", "Registration failed: " + e.getMessage());
-            model.addAttribute("name", registerRequest.getName());  // ✅ Changed from username
+            model.addAttribute("name", registerRequest.getName());
             model.addAttribute("email", registerRequest.getEmail());
             return "signup";
         }
@@ -111,10 +124,11 @@ public class AuthController {
         try {
             String token = (String) session.getAttribute("token");
             if (token != null) {
+                logger.info("Signing out user with token: {}", token.substring(0, Math.min(10, token.length())) + "...");
                 userServiceClient.logout(token);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error during logout: {}", e.getMessage(), e);
         }
 
         session.invalidate();
@@ -130,6 +144,7 @@ public class AuthController {
     @GetMapping("/services")
     @ResponseBody
     public String checkServices() {
+        logger.info("Checking registered services via DiscoveryClient...");
         StringBuilder sb = new StringBuilder();
         sb.append("=== AVAILABLE SERVICES ===\n");
 
